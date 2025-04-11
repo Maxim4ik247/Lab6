@@ -1,0 +1,26 @@
+<workers>
+    <Worker>
+        <id>5</id>
+        <name>1</name>
+        <Coordinates>
+            <x>1.0</x>
+            <y>1.0</y>
+        </Coordinates>
+        <creationDate>2025-03-15T11:02:39.686255</creationDate>
+        <salary>1.0</salary>
+        <position>HEAD_OF_DIVISION</position>
+        <status>REGULAR</status>
+        <Person>
+            <height>1</height>
+            <eyeColor>BROWN</eyeColor>
+            <hairColor>BROWN</hairColor>
+            <nationality>NORTH_KOREA</nationality>
+            <Location>
+                <x>1.0</x>
+                <y>1.0</y>
+                <z>1</z>
+                <name>1</name>
+            </Location>
+        </Person>
+    </Worker>
+</workers>
