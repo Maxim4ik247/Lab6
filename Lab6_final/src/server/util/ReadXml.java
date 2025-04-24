@@ -33,34 +33,35 @@ public class ReadXml {
             for (int i = 0; i < objectList.getLength(); i++) {
                 Element objectElement = (Element) objectList.item(i);
 
-                Worker worker = new Worker();
-                Coordinates coordinates = new Coordinates();
-                Person person = new Person();
-                Location location = new Location();
+//                Worker worker = new Worker();
+                Coordinates coordinates = new Coordinates(
+                        Float.parseFloat(objectElement.getElementsByTagName("x").item(0).getTextContent()),
+                        Float.parseFloat(objectElement.getElementsByTagName("y").item(0).getTextContent())
+                );
+                Location location = new Location(
+                        Float.parseFloat(objectElement.getElementsByTagName("x").item(1).getTextContent()),
+                        Float.parseFloat(objectElement.getElementsByTagName("y").item(1).getTextContent()),
+                        Long.parseLong(objectElement.getElementsByTagName("z").item(0).getTextContent()),
+                        objectElement.getElementsByTagName("x").item(1).getTextContent()
+                        );
 
+                Person person = new Person(
+                        Integer.parseInt(objectElement.getElementsByTagName("height").item(0).getTextContent()),
+                        Color.valueOf(objectElement.getElementsByTagName("eyeColor").item(0).getTextContent()),
+                        Color.valueOf(objectElement.getElementsByTagName("hairColor").item(0).getTextContent()),
+                        Country.valueOf(objectElement.getElementsByTagName("nationality").item(0).getTextContent()),
+                        location
+                        );
 
-                coordinates.setX(Float.parseFloat(objectElement.getElementsByTagName("x").item(0).getTextContent()));
-                coordinates.setY(Float.parseFloat(objectElement.getElementsByTagName("y").item(0).getTextContent()));
-
-                location.setName(objectElement.getElementsByTagName("x").item(1).getTextContent());
-                location.setX(Float.parseFloat(objectElement.getElementsByTagName("x").item(1).getTextContent()));
-                location.setY(Float.parseFloat(objectElement.getElementsByTagName("y").item(1).getTextContent()));
-                location.setZ(Long.parseLong(objectElement.getElementsByTagName("z").item(0).getTextContent()));
-
-                person.setLocation(location);
-                person.setHeight(Integer.parseInt(objectElement.getElementsByTagName("height").item(0).getTextContent()));
-                person.setEyeColor(Color.valueOf(objectElement.getElementsByTagName("eyeColor").item(0).getTextContent()));
-                person.setHairColor(Color.valueOf(objectElement.getElementsByTagName("hairColor").item(0).getTextContent()));
-                person.setNationality(Country.valueOf(objectElement.getElementsByTagName("nationality").item(0).getTextContent()));
-
-                Worker worker = new Worker(worker.setId(Integer.parseInt(objectElement.getElementsByTagName("id").item(0).getTextContent())),
-                worker.setName(objectElement.getElementsByTagName("name").item(0).getTextContent()),
-                worker.setCreationDate(LocalDateTime.parse(objectElement.getElementsByTagName("creationDate").item(0).getTextContent())),
-                worker.setCoordinates(coordinates),
-                worker.setPerson(person),
-                worker.setPosition(Position.valueOf(objectElement.getElementsByTagName("position").item(0).getTextContent())),
-                worker.setSalary(Float.parseFloat(objectElement.getElementsByTagName("salary").item(0).getTextContent())),
-                worker.setStatus(Status.valueOf(objectElement.getElementsByTagName("status").item(0).getTextContent())));
+                Worker worker = new Worker(Integer.parseInt(objectElement.getElementsByTagName("id").item(0).getTextContent()),
+                        objectElement.getElementsByTagName("name").item(0).getTextContent(),
+                        coordinates,
+                        LocalDateTime.parse(objectElement.getElementsByTagName("creationDate").item(0).getTextContent()),
+                        Float.parseFloat(objectElement.getElementsByTagName("salary").item(0).getTextContent()),
+                        Position.valueOf(objectElement.getElementsByTagName("position").item(0).getTextContent()),
+                        Status.valueOf(objectElement.getElementsByTagName("status").item(0).getTextContent()),
+                        person
+                );
 
 
                 list.add(worker);

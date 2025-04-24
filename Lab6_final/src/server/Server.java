@@ -1,10 +1,12 @@
 package server;
 
+import data.Worker;
 import data.network.Request;
 import data.network.Response;
 import server.system.CollectionManager;
 import server.system.CommandManager;
 import server.system.WorkerCreator;
+import server.util.ReadXml;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -12,17 +14,29 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
 public class Server {
 
 
-    private final WorkerCreator workerCreator = new WorkerCreator();
-    private final CollectionManager collectionManager = new CollectionManager();
-    private final CommandManager commandManager = new CommandManager(collectionManager, workerCreator);
 
-    public void startServer() throws IOException, ClassNotFoundException {
+    private final WorkerCreator workerCreator = new WorkerCreator();
+    private final CollectionManager collectionManager;
+    private final CommandManager commandManager;
+
+    public Server(CollectionManager collectionManager) {
+        this.collectionManager = collectionManager;
+        this.commandManager = new CommandManager(collectionManager, workerCreator);
+    }
+
+
+
+    public void startServer(String path) throws IOException, ClassNotFoundException {
+
+
 
 
         // Создаем серверный канал
@@ -30,13 +44,19 @@ public class Server {
         serverChannel.configureBlocking(false);
 
         // Привязываем канал к порту
-        serverChannel.bind(new InetSocketAddress(InetAddress.getByName("localhost"), 8080));
+        serverChannel.bind(new InetSocketAddress(InetAddress.getByName("localhost"), 24555));
 
         // Создаем селектор
         Selector selector = Selector.open();
         // Регистрируем серверный канал для приема подключений
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("TCP-сервер запущен на порту 8080");
+
+        for (Worker worker : ReadXml.read(path)) {
+            collectionManager.add(worker);
+        }
+
+
+        System.out.println("TCP-сервер запущен на порту 24555");
 
         // Основной цикл обработки событий
         while (true) {
@@ -69,13 +89,13 @@ public class Server {
 
     // Обработка события READ (получение данных)
     private void handleRead(SelectionKey key, Selector selector) throws IOException, ClassNotFoundException {
+
         SocketChannel clientChannel = (SocketChannel) key.channel();
         // Читаем данные от клиента
-        ByteBuffer buffer = ByteBuffer.allocate(5000);
+        ByteBuffer buffer = dynamicBuffer(clientChannel);
         try {
-            int bytesRead = clientChannel.read(buffer);
-            if (bytesRead > 0) {
-                buffer.flip();
+
+            if (buffer.position() > 0) {
 
                 ByteArrayInputStream bi = new ByteArrayInputStream(buffer.array());
                 ObjectInputStream oi = new ObjectInputStream(bi);
@@ -83,15 +103,17 @@ public class Server {
 
                 System.out.println("Получено сообщение от клиента: " + clientChannel.getRemoteAddress().toString());
 
-                Response response = new Response(commandManager.doCommand(request));
+                Response response;
+                try {
+                    response = new Response(commandManager.doCommand(request));
+                } catch (Exception e) {
+                    response = new Response("Возникла ошибка" + e.getMessage());
+                }
+
 
                 sendAnswer(clientChannel, response);
 
                 clientChannel.register(selector, SelectionKey.OP_READ);
-            } else if (bytesRead == -1) {
-                // Соединение закрыто клиентом
-                clientChannel.close();
-                System.out.println("Соединение закрыто клиентом.");
             }
         } catch (SocketException e) {
             System.err.println("Соединение сброшено: " + e.getMessage());
@@ -117,5 +139,30 @@ public class Server {
 
         System.out.println("Request was sent to " + client.socket().toString());
 
+    }
+
+    public ByteBuffer dynamicBuffer(SocketChannel client) throws IOException {
+        ArrayList<ByteBuffer> bufferList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ByteBuffer buffer = ByteBuffer.allocate(8192);
+            int bytesRead = client.read(buffer);
+            if (bytesRead == -1) {
+                // Соединение закрыто клиентом
+                client.close();
+                System.out.println("Соединение закрыто клиентом.");
+                return ByteBuffer.allocate(0);
+            }
+            if (buffer.limit() == buffer.position() || bufferList.isEmpty()) {
+                bufferList.add(buffer);
+            } else {
+                break;
+            }
+        }
+        ByteBuffer bigBuffer = ByteBuffer.allocate(bufferList.size() * 8192);
+        for (ByteBuffer byteBuffer : bufferList) {
+            bigBuffer.put(byteBuffer.array());
+        }
+
+        return bigBuffer;
     }
 }

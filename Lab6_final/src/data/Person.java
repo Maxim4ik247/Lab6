@@ -1,6 +1,8 @@
 package data;
 
-public class Person {
+import java.io.Serializable;
+
+public class Person implements Serializable {
     private Integer height; //Поле может быть null, Значение поля должно быть больше 0
     private Color eyeColor; //Поле может быть null
     private Color hairColor; //Поле может быть null

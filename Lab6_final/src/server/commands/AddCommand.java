@@ -14,9 +14,8 @@ public class AddCommand implements BaseCommand {
 
     @Override
     public String executeCommand(Request i) {
-        i.getWorker().setId(1);
         collectionManager.add(i.getWorker());
-        return "";
+        return "Работник добавлен";
     }
 
     @Override

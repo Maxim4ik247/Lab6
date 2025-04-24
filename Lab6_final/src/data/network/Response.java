@@ -9,10 +9,9 @@ public class Response implements Serializable {
         this.info = info;
     }
 
+
     @Override
     public String toString() {
-        return "Response{" +
-                "info='" + info + '\'' +
-                '}';
+        return info;
     }
 }

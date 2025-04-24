@@ -1,6 +1,8 @@
 package data;
 
-public class Location {
+import java.io.Serializable;
+
+public class Location implements Serializable {
     private Float x; //Поле не может быть null
     private float y;
     private long z;

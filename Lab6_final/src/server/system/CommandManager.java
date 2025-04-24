@@ -1,6 +1,7 @@
 package server.system;
 
 
+import client.ExitCommand;
 import data.network.Request;
 import server.commands.*;
 
@@ -17,15 +18,12 @@ public class CommandManager {
         commandMap.put("update", new UpdateCommand(collectionManager, workerCreator));
         commandMap.put("remove_by_id", new RemoveByIdCommmand(collectionManager));
         commandMap.put("clear", new ClearCommand(collectionManager));
-        commandMap.put("exit", new ExitCommand());
         commandMap.put("remove_first", new RemoveFirstCommand(collectionManager));
         commandMap.put("shuffle", new ShuffleCommand(collectionManager));
         commandMap.put("reorder", new ReorderCommand(collectionManager));
         commandMap.put("average_of_salary", new AverageOfSalaryCommand(collectionManager));
         commandMap.put("print_ascending", new PrintAscendingCommand(collectionManager));
         commandMap.put("print_field_descending_salary", new PrintFieldDescendingSalary(collectionManager));
-        commandMap.put("execute_script", new ExecuteScriptCommand(collectionManager, new ScriptExecutor(this)));
-        commandMap.put("save", new SaveDataCommand(collectionManager));
     }
 
     public String doCommand (Request input) {
@@ -40,10 +38,12 @@ public class CommandManager {
     }
 
     public String help() {
+        String output = "";
         for (BaseCommand c : commandMap.values()) {
+            output += c.getCommandName() + " - " + c.getCommandDescription() + "\n";
             System.out.println(c.getCommandName() + " - " + c.getCommandDescription());
         }
-        return "";
+        return output;
     }
 
 }

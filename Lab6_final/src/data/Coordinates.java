@@ -1,6 +1,8 @@
 package data;
 
-public class Coordinates {
+import java.io.Serializable;
+
+public class Coordinates implements Serializable {
     private Float x; //Максимальное значение поля: 769, Поле не может быть null
     private float y; //Максимальное значение поля: 682
 

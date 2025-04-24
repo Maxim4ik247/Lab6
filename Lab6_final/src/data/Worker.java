@@ -1,8 +1,9 @@
 package data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Worker implements Comparable<Worker> {
+public class Worker implements Comparable<Worker>, Serializable {
     private static int counter = 1;
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
@@ -19,6 +20,19 @@ public class Worker implements Comparable<Worker> {
         this.id = counter;
         this.name = name;
         this.coordinates = coordinates;
+        this.salary = salary;
+        this.position = position;
+        this.status = status;
+        this.person = person;
+    }
+
+    public Worker(Integer id, String name, Coordinates coordinates, LocalDateTime creationDate, Float salary, Position position, Status status, Person person) {
+        counter++;
+        counter = Math.max(counter, id);
+        this.id = id;
+        this.name = name;
+        this.coordinates = coordinates;
+        this.creationDate = creationDate;
         this.salary = salary;
         this.position = position;
         this.status = status;
